@@ -3,7 +3,7 @@ version: "3.1"
 services:
   PostgreSQL:
 #   restart: always
-    container_name: postgres_9
+    container_name: postgres-9
     image: postgres:9.6
     ports:
       - "5433:5432"
