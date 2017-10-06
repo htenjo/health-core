@@ -1,5 +1,7 @@
 # Health Analytics
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/da4ebf9c9d9e4273957aa7a5248f9acd)](https://www.codacy.com/app/zerovirus23/health-core?utm_source=github.com&utm_medium=referral&utm_content=zerovirus23/health-core&utm_campaign=badger)
+
 Health Analytics is a beta project that provides services required by M4H:
   - Load/Unload statistical information
   - Generate health events
