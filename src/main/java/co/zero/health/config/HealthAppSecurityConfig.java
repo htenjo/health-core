@@ -39,7 +39,7 @@ public class HealthAppSecurityConfig extends WebSecurityConfigurerAdapter {
                 //TODO: Invert this to have all denied by default
                 .anyRequest().permitAll();
 
-//
+
 //                .antMatchers(HttpMethod.GET, "/health").permitAll()
 //                //Any resource just need to be authenticated
 //                //.anyRequest().authenticated()
