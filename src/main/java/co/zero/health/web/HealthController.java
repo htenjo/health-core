@@ -18,7 +18,7 @@ import java.util.List;
  * Created by hernan on 7/4/17.
  */
 @RestController
-@RequestMapping(value = "/health"
+@RequestMapping(value = "/healthx"
         , consumes = Constant.CONTENT_TYPE_JSON
         , produces = Constant.CONTENT_TYPE_JSON)
 @SuppressWarnings(Constant.WARNING_UNUSED)
