@@ -34,8 +34,14 @@ public class HealthAppSecurityConfig extends WebSecurityConfigurerAdapter {
         JwtWebSecurityConfigurer
                 .forRS256(apiAudience, issuer)
                 .configure(http)
-                .authorizeRequests()
 
+                .authorizeRequests()
+                //TODO: Invert this to have all denied by default
+                .anyRequest().permitAll()
+
+                .antMatchers(HttpMethod.GET, "/health").permitAll()
+                //Any resource just need to be authenticated
+                //.anyRequest().authenticated()
                 .antMatchers(HttpMethod.GET, "/company/**").hasAuthority("read:company")
                 .antMatchers(HttpMethod.POST, "/company/*").hasAuthority("create:company")
                 .antMatchers(HttpMethod.PUT, "/company/**").hasAuthority("update:company")
@@ -59,10 +65,7 @@ public class HealthAppSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/patient/*/event/**").hasAuthority("read:event")
                 .antMatchers(HttpMethod.POST, "/patient/*/event**").hasAuthority("create:event")
                 .antMatchers(HttpMethod.PUT, "/patient/*/event**").hasAuthority("update:event")
-                .antMatchers(HttpMethod.DELETE, "/patient/*/event**").hasAuthority("delete:event")
-
-                //Any other resource just need to be authenticated
-                .anyRequest().authenticated();
+                .antMatchers(HttpMethod.DELETE, "/patient/*/event**").hasAuthority("delete:event");
     }
 
     @Bean
