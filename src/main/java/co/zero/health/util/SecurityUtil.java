@@ -6,6 +6,8 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.Optional;
+
 public final class SecurityUtil {
     /**
      * Specific function that gets the companyID of the current logged user from the JWT
@@ -14,7 +16,8 @@ public final class SecurityUtil {
     public static final Long getCompanyId(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         DecodedJWT jwtInfo = (DecodedJWT) authentication.getDetails();
-        return jwtInfo.getClaim(Constant.CLAIM_COMPANY_ID).asLong();
+        Optional<Long> companyId = Optional.ofNullable(jwtInfo.getClaim(Constant.CLAIM_COMPANY_ID).asLong());
+        return companyId.orElseThrow(() -> new IllegalArgumentException("JWT doesn't have the CompanyID claim"));
     }
 
     /**

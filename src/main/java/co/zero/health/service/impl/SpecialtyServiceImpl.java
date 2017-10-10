@@ -7,6 +7,7 @@ import co.zero.health.service.SpecialtyService;
 import co.zero.health.util.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
