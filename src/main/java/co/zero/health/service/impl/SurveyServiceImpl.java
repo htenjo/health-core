@@ -72,6 +72,7 @@ public class SurveyServiceImpl implements SurveyService {
                 .specialtyId(persistedSurvey.getTemplate().getSpecialty().getId())
                 .templateId(persistedSurvey.getTemplate().getId())
                 .surveyAnswersCsv(SurveyUtils.formatAnswersAsCSV(answers, false))
+                .finished(persistedSurvey.getState() == SurveyState.FINISHED)
                 .build();
         statisticRepository.save(statistics);
         return save(persistedSurvey);

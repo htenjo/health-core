@@ -29,5 +29,5 @@ public class SurveyStatistics {
     private Long eventId;
     private Long patientId;
     private String surveyAnswersCsv;
-
+    private Boolean finished;
 }
