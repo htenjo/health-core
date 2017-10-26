@@ -5,6 +5,7 @@ import co.zero.health.model.Patient;
 import co.zero.health.service.CompanyService;
 import co.zero.health.service.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -55,14 +56,22 @@ public class PatientController {
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<Patient> save(@RequestBody Patient patient) {
-        Patient persistedPatient = patientService.save(patient);
-        return new ResponseEntity<>(persistedPatient, HttpStatus.CREATED);
+        try {
+            Patient persistedPatient = patientService.save(patient);
+            return new ResponseEntity<>(persistedPatient, HttpStatus.CREATED);
+        }catch (DataIntegrityViolationException e) {
+            return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
+        }
     }
 
     @RequestMapping(method = RequestMethod.PUT)
     public ResponseEntity<Patient> update(@RequestBody Patient patient) {
-        Patient persistedPatient = patientService.update(patient);
-        return new ResponseEntity<>(persistedPatient, HttpStatus.CREATED);
+        try {
+            Patient persistedPatient = patientService.save(patient);
+            return new ResponseEntity<>(persistedPatient, HttpStatus.CREATED);
+        }catch (DataIntegrityViolationException e) {
+            return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
+        }
     }
 
     @RequestMapping(value = "/{patientId}", method = RequestMethod.DELETE)

@@ -1,7 +1,6 @@
 package co.zero.health.web;
 
 import co.zero.health.common.Constant;
-import co.zero.health.model.Specialty;
 import co.zero.health.model.SurveyTemplate;
 import co.zero.health.service.CompanyService;
 import co.zero.health.service.SpecialtyService;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;

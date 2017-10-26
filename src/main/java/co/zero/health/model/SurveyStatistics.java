@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -28,6 +29,7 @@ public class SurveyStatistics {
     private Long templateId;
     private Long eventId;
     private Long patientId;
+    @Column(columnDefinition = "text")
     private String surveyAnswersCsv;
     private Boolean finished;
 }

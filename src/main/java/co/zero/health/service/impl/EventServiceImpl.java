@@ -104,7 +104,7 @@ public class EventServiceImpl implements EventService {
      */
     @Override
     public List<Event> findAllByPatientId(Long patientId) {
-        return eventRepository.findAllByPatientId(patientId);
+        return eventRepository.findAllByOrderByPatientIdAsc(patientId);
     }
 
     /**
