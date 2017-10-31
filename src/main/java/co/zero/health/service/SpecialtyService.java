@@ -1,5 +1,6 @@
 package co.zero.health.service;
 
+import co.zero.health.dto.SpecialtyStatisticsDTO;
 import co.zero.health.model.Specialty;
 import org.springframework.stereotype.Service;
 
@@ -10,4 +11,5 @@ import java.util.List;
  */
 public interface SpecialtyService extends GenericCrud<Specialty>{
     List<Specialty> findAllByCompanyId(Long companyId);
+    List<SpecialtyStatisticsDTO> getStatistics(Long specialtyId);
 }
