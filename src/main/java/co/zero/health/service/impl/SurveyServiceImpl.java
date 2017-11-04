@@ -4,23 +4,31 @@ import co.zero.health.json.SurveyJs;
 import co.zero.health.model.Survey;
 import co.zero.health.model.SurveyState;
 import co.zero.health.model.SurveyStatistics;
+import co.zero.health.model.SurveyTemplate;
 import co.zero.health.persistence.SurveyRepository;
 import co.zero.health.persistence.SurveyStatisticRepository;
+import co.zero.health.persistence.SurveyTemplateRepository;
 import co.zero.health.service.SurveyService;
 import co.zero.health.util.SurveyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * Created by hernan on 7/2/17.
  */
 @Service
 public class SurveyServiceImpl implements SurveyService {
+    @Autowired
+    private SurveyTemplateRepository surveyTemplateRepository;
+
     @Autowired
     private SurveyRepository surveyRepository;
     @Autowired
@@ -101,5 +109,40 @@ public class SurveyServiceImpl implements SurveyService {
     public void deleteAllByPatientId(Long patientId) {
         statisticRepository.deleteAllByPatientId(patientId);
         surveyRepository.deleteAllByPatientId(patientId);
+    }
+
+
+    @Override
+    public Stream<String> getStatistics(Long templateId) {
+        Set<String> questionNames = getTemplateQuestionNames(templateId);
+        return surveyRepository
+                .findAllByTemplateId(templateId)
+                .map(Survey::getSurveyAnswers)
+                .map(SurveyUtils::parseSurveyAnswers)
+                .map(surveyAnswersMap -> transformSurveyAnswersToCSV(questionNames, surveyAnswersMap));
+    }
+
+    /**
+     * Gets the question names from the template model.
+     * @param templateId Template identifier
+     * @return Set of names in orden from the template model.
+     */
+    private Set<String> getTemplateQuestionNames(Long templateId) {
+        SurveyTemplate template = surveyTemplateRepository.findOne(templateId);
+        SurveyJs surveyJsModel = SurveyUtils.parseSurveyModel(template.getJsSurvey());
+        return SurveyUtils.getQuestionNamesFromSurveyModel(surveyJsModel);
+    }
+
+    /**
+     *
+     * @param questionNames
+     * @param surveyAnswers
+     * @return
+     */
+    private static String transformSurveyAnswersToCSV(Set<String> questionNames, Map<String, Object> surveyAnswers) {
+        Map<String, Object> orderedAnswers = new LinkedHashMap<>();
+        questionNames.stream()
+                .forEach(name -> orderedAnswers.put(name, surveyAnswers.get(name)));
+        return SurveyUtils.formatAnswersAsCSV(orderedAnswers, true);
     }
 }

@@ -8,6 +8,7 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -113,10 +114,10 @@ public class SurveyUtils {
      * @param model Object with the information to analise
      * @return Set of question names
      */
-    private static Set<String> getQuestionNamesFromSurveyModel(SurveyJs model) {
+    public static Set<String> getQuestionNamesFromSurveyModel(SurveyJs model) {
         return model.getPages().stream()
                 .flatMap(page -> page.elements.stream())
                 .map(question -> question.name)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 }

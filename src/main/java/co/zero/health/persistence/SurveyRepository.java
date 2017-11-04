@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 @Repository
 public interface SurveyRepository extends PagingAndSortingRepository<Survey, Long> {
@@ -14,4 +15,11 @@ public interface SurveyRepository extends PagingAndSortingRepository<Survey, Lon
     List<Survey> findAllByPatientId(@Param("patientId") Long patientId);
     void deleteAllByEventId(Long eventId);
     void deleteAllByPatientId(Long patientId);
+
+    /**
+     * List all surveys filtering by Teamplte
+     * @param templateId Identifier of the template filter
+     * @return Stream of all surveys related with the given template
+     */
+    Stream<Survey> findAllByTemplateId(Long templateId);
 }

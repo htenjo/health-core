@@ -4,6 +4,7 @@ import co.zero.health.common.Constant;
 import co.zero.health.model.SurveyTemplate;
 import co.zero.health.service.CompanyService;
 import co.zero.health.service.SpecialtyService;
+import co.zero.health.service.SurveyService;
 import co.zero.health.service.SurveyTemplateService;
 import co.zero.health.util.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +29,16 @@ import java.util.List;
 @SuppressWarnings(Constant.WARNING_UNUSED)
 public class SurveyTemplateController {
     private static final String SPECIALTY_ID_PARAM = "specialtyId";
+    private static final String TEMPLATE_ID = "templateId";
+
     @Autowired
     private SpecialtyService specialtyService;
     @Autowired
     private CompanyService companyService;
     @Autowired
     private SurveyTemplateService surveyTemplateService;
+    @Autowired
+    private SurveyService surveyService;
 
 
     @RequestMapping(method = RequestMethod.GET)
@@ -64,5 +69,17 @@ public class SurveyTemplateController {
     public ResponseEntity delete(@PathVariable("surveyTemplateId") Long surveyTemplateId) {
         surveyTemplateService.delete(surveyTemplateId);
         return new ResponseEntity(HttpStatus.ACCEPTED);
+    }
+
+    @RequestMapping(value = "/{templateId}/statistics", method = RequestMethod.GET)
+    public ResponseEntity<String> buildStatisticsByTemplate(@PathVariable(TEMPLATE_ID) Long templateId) {
+        //TODO: Verify how to return the csv information
+        StringBuilder csvInfo = new StringBuilder();
+        surveyService.getStatistics(templateId)
+                .forEach(surveyInfo -> {
+                    csvInfo.append(surveyInfo);
+                    csvInfo.append("\n");
+                });
+        return new ResponseEntity<>(csvInfo.toString(), HttpStatus.OK);
     }
 }
