@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -23,8 +24,12 @@ public class SurveyUtils {
     @SuppressWarnings("unchecked")
     public static Map<String, Object> parseSurveyAnswers(String jsonAnswers) throws IllegalArgumentException {
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            return mapper.readValue(jsonAnswers, LinkedHashMap.class);
+            if (StringUtils.isNotBlank(jsonAnswers)) {
+                ObjectMapper mapper = new ObjectMapper();
+                return mapper.readValue(jsonAnswers, LinkedHashMap.class);
+            } else {
+                return new LinkedHashMap<>();
+            }
         } catch (IOException e) {
             throw new IllegalArgumentException("Error trying to parse the surveyAnswers", e);
         }

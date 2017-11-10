@@ -10,10 +10,12 @@ import co.zero.health.persistence.SurveyStatisticRepository;
 import co.zero.health.persistence.SurveyTemplateRepository;
 import co.zero.health.service.SurveyService;
 import co.zero.health.util.SurveyUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +27,7 @@ import java.util.stream.Stream;
  * Created by hernan on 7/2/17.
  */
 @Service
+@Slf4j
 public class SurveyServiceImpl implements SurveyService {
     @Autowired
     private SurveyTemplateRepository surveyTemplateRepository;
@@ -111,15 +114,28 @@ public class SurveyServiceImpl implements SurveyService {
         surveyRepository.deleteAllByPatientId(patientId);
     }
 
-
     @Override
-    public Stream<String> getStatistics(Long templateId) {
+    @Transactional(readOnly = true)
+    public String getStatistics(Long templateId) {
+        StringBuilder csvInfo = new StringBuilder();
         Set<String> questionNames = getTemplateQuestionNames(templateId);
-        return surveyRepository
-                .findAllByTemplateId(templateId)
-                .map(Survey::getSurveyAnswers)
-                .map(SurveyUtils::parseSurveyAnswers)
-                .map(surveyAnswersMap -> transformSurveyAnswersToCSV(questionNames, surveyAnswersMap));
+        String NEW_LINE = "\n";
+        csvInfo.append(transformSurveyAnswersToCSV(questionNames, new HashMap<>(), true));
+        csvInfo.append(NEW_LINE);
+
+        try (Stream<Survey> surveyStream = surveyRepository.findAllByTemplateId(templateId)) {
+            surveyStream.map(Survey::getSurveyAnswers)
+                    .map(SurveyUtils::parseSurveyAnswers)
+                    .map(surveyAnswersMap -> transformSurveyAnswersToCSV(questionNames, surveyAnswersMap, false))
+                    .forEach(surveyInfo -> {
+                        csvInfo.append(surveyInfo);
+                        csvInfo.append(NEW_LINE);
+                    });
+        }catch (Exception e) {
+            log.error("::: Error transforming surveys to CSV format ", e);
+        }
+
+        return csvInfo.toString();
     }
 
     /**
@@ -139,10 +155,11 @@ public class SurveyServiceImpl implements SurveyService {
      * @param surveyAnswers
      * @return
      */
-    private static String transformSurveyAnswersToCSV(Set<String> questionNames, Map<String, Object> surveyAnswers) {
+    private static String transformSurveyAnswersToCSV(Set<String> questionNames
+            , Map<String, Object> surveyAnswers, boolean withHeaders) {
         Map<String, Object> orderedAnswers = new LinkedHashMap<>();
         questionNames.stream()
                 .forEach(name -> orderedAnswers.put(name, surveyAnswers.get(name)));
-        return SurveyUtils.formatAnswersAsCSV(orderedAnswers, true);
+        return SurveyUtils.formatAnswersAsCSV(orderedAnswers, withHeaders);
     }
 }

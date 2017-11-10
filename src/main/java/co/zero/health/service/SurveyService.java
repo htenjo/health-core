@@ -1,10 +1,8 @@
 package co.zero.health.service;
 
 import co.zero.health.model.Survey;
-import co.zero.health.model.SurveyTemplate;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * Created by hernan on 7/2/17.
@@ -19,5 +17,5 @@ public interface SurveyService extends GenericCrud<Survey> {
      * @param templateId SurveyTemplate identifier
      * @return Lines in csv format from the survey responses.
      */
-    Stream<String> getStatistics(Long templateId);
+    String getStatistics(Long templateId);
 }

@@ -43,7 +43,7 @@ public class SurveyTemplateController {
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<List<SurveyTemplate>> findAll(
-            @PathVariable(SPECIALTY_ID_PARAM) Long specialtyId){
+            @PathVariable(SPECIALTY_ID_PARAM) Long specialtyId) {
         Long companyId = SecurityUtil.getCompanyId();
         List<SurveyTemplate> surveys = surveyTemplateService.findAllBySpecialtyId(specialtyId);
         return new ResponseEntity<>(surveys, HttpStatus.OK);
@@ -52,15 +52,15 @@ public class SurveyTemplateController {
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<SurveyTemplate> save(
             @PathVariable(SPECIALTY_ID_PARAM) Long specialtyId,
-            @RequestBody SurveyTemplate surveyTemplate){
+            @RequestBody SurveyTemplate surveyTemplate) {
         SurveyTemplate persistedSurveyTemplate = surveyTemplateService.save(surveyTemplate, specialtyId);
         return new ResponseEntity<>(persistedSurveyTemplate, HttpStatus.CREATED);
     }
 
     @RequestMapping(method = RequestMethod.PUT)
-    public ResponseEntity<SurveyTemplate> update (
+    public ResponseEntity<SurveyTemplate> update(
             @PathVariable(SPECIALTY_ID_PARAM) Long specialtyId,
-            @RequestBody SurveyTemplate surveyTemplate){
+            @RequestBody SurveyTemplate surveyTemplate) {
         SurveyTemplate persistedSurveyTemplate = surveyTemplateService.update(surveyTemplate, specialtyId);
         return new ResponseEntity<>(persistedSurveyTemplate, HttpStatus.CREATED);
     }
@@ -73,13 +73,15 @@ public class SurveyTemplateController {
 
     @RequestMapping(value = "/{templateId}/statistics", method = RequestMethod.GET)
     public ResponseEntity<String> buildStatisticsByTemplate(@PathVariable(TEMPLATE_ID) Long templateId) {
-        //TODO: Verify how to return the csv information
-        StringBuilder csvInfo = new StringBuilder();
-        surveyService.getStatistics(templateId)
-                .forEach(surveyInfo -> {
-                    csvInfo.append(surveyInfo);
-                    csvInfo.append("\n");
-                });
-        return new ResponseEntity<>(csvInfo.toString(), HttpStatus.OK);
+        String statisticsAsCsv = surveyService.getStatistics(templateId);
+        return new ResponseEntity<>(statisticsAsCsv, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/{templateId}/upload", method = RequestMethod.POST)
+    public ResponseEntity<String> uploadInfoByTemplate(
+            @PathVariable(TEMPLATE_ID) Long templateId,
+            @RequestBody String csvInfo) {
+        System.out.println("::: csvInfo = " + csvInfo);
+        return new ResponseEntity<>("{\"uploadedRows\":666}", HttpStatus.OK);
     }
 }
