@@ -6,6 +6,7 @@ import co.zero.health.service.CompanyService;
 import co.zero.health.service.SpecialtyService;
 import co.zero.health.service.SurveyService;
 import co.zero.health.service.SurveyTemplateService;
+import co.zero.health.service.UploaderService;
 import co.zero.health.util.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -39,6 +40,8 @@ public class SurveyTemplateController {
     private SurveyTemplateService surveyTemplateService;
     @Autowired
     private SurveyService surveyService;
+    @Autowired
+    private UploaderService uploaderService;
 
 
     @RequestMapping(method = RequestMethod.GET)
@@ -82,6 +85,8 @@ public class SurveyTemplateController {
             @PathVariable(TEMPLATE_ID) Long templateId,
             @RequestBody String csvInfo) {
         System.out.println("::: csvInfo = " + csvInfo);
-        return new ResponseEntity<>("{\"uploadedRows\":666}", HttpStatus.OK);
+        int itemsUploaded = uploaderService.uploadInfo(templateId, csvInfo);
+        String response = "{\"uploadedRows\":%s}";
+        return new ResponseEntity<>(String.format(response, Integer.toString(itemsUploaded)), HttpStatus.OK);
     }
 }
