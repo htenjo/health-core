@@ -117,4 +117,9 @@ public class EventServiceImpl implements EventService {
                 .find(patientId)
                 .orElseThrow(() -> new IllegalArgumentException("Patient with doesn't exist"));
     }
+
+    @Override
+    public Optional<Event> findByLoadedId(Long patientId, String loadedId) {
+        return Optional.ofNullable(eventRepository.findOneByPatientIdAndloadedId(patientId, loadedId));
+    }
 }

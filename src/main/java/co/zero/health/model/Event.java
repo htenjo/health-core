@@ -36,4 +36,5 @@ public class Event extends AbstractEntity {
     @JsonIgnore
     private Patient patient;
     private String name;
+    private String loadedId;
 }

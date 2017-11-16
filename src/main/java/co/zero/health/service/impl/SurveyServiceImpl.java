@@ -96,6 +96,11 @@ public class SurveyServiceImpl implements SurveyService {
     }
 
     @Override
+    public Optional<Survey> findByEventIdAndTemplateId(Long eventId, Long templateId) {
+        return Optional.ofNullable(surveyRepository.findByEventIdAndTemplateId(eventId, templateId));
+    }
+
+    @Override
     public void delete(Long surveyId) {
         surveyRepository.delete(surveyId);
     }

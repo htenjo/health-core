@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.QueryHint;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.hibernate.jpa.QueryHints.HINT_FETCH_SIZE;
@@ -27,4 +28,6 @@ public interface SurveyRepository extends PagingAndSortingRepository<Survey, Lon
      */
     @QueryHints(value = @QueryHint(name = HINT_FETCH_SIZE, value = "1"))
     Stream<Survey> findAllByTemplateId(Long templateId);
+
+    Survey findByEventIdAndTemplateId(Long eventId, Long templateId);
 }
