@@ -2,14 +2,21 @@ package co.zero.health.util;
 
 import co.zero.health.json.SurveyJs;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvParser;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -32,6 +39,26 @@ public class SurveyUtils {
             }
         } catch (IOException e) {
             throw new IllegalArgumentException("Error trying to parse the surveyAnswers", e);
+        }
+    }
+
+    public static String transformQuestionsAndAnswersToJson(Set<String> questions, List<String> responseColumns) {
+        if(questions.size() != responseColumns.size()) {
+            throw new IllegalArgumentException("::: Invalid answers for given model");
+        }
+
+        Map<String, String> answers = new LinkedHashMap<>();
+        Iterator<String> answerIterator = responseColumns.iterator();
+
+        questions.forEach(question -> {
+            answers.put(question, answerIterator.next());
+        });
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.writeValueAsString(answers);
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException("::: Error trying to transform to json from map", e);
         }
     }
 
@@ -97,6 +124,15 @@ public class SurveyUtils {
         }catch (JsonProcessingException e){
             throw new IllegalArgumentException("Error trying to format survey answers to CSV", e);
         }
+    }
+
+    public static MappingIterator<String[]> readAnswersFromCSV(Set<String> questions, String answers) throws IOException {
+        CsvSchema schema = CsvSchema.builder()
+                .setSkipFirstDataRow(true)
+                .build();
+        CsvMapper mapper = new CsvMapper();
+        mapper.enable(CsvParser.Feature.WRAP_AS_ARRAY);
+        return mapper.readerFor(String[].class).with(schema).readValues(answers);
     }
 
     /**

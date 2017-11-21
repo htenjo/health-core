@@ -101,6 +101,11 @@ public class SurveyServiceImpl implements SurveyService {
     }
 
     @Override
+    public Optional<Survey> findByPatientIdAndTemplateId(Long patientId, Long templateId) {
+        return Optional.ofNullable(surveyRepository.findByPatientIdAndTemplateId(patientId, templateId));
+    }
+
+    @Override
     public void delete(Long surveyId) {
         surveyRepository.delete(surveyId);
     }

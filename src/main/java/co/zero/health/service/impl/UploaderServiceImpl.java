@@ -6,27 +6,30 @@ import co.zero.health.model.Patient;
 import co.zero.health.model.Specialty;
 import co.zero.health.model.Survey;
 import co.zero.health.model.SurveyTemplate;
+import co.zero.health.model.SurveyType;
 import co.zero.health.service.EventService;
 import co.zero.health.service.PatientService;
 import co.zero.health.service.SurveyService;
 import co.zero.health.service.SurveyTemplateService;
 import co.zero.health.service.UploaderService;
 import co.zero.health.util.SurveyUtils;
-import org.apache.commons.lang.StringUtils;
+import com.fasterxml.jackson.databind.MappingIterator;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+@Slf4j
 @Service
 public class UploaderServiceImpl implements UploaderService {
-    private static final String NEW_LINE = "\n";
-    private static final String COMMA = ",";
-    private static final int PATIENT_ID_INDEX = 0;
-    private static final int EVENT_ID_INDEX = 1;
+    private static final int START_COLUMN_INDEX = 0;
     @Autowired
     private SurveyService surveyService;
     @Autowired
@@ -40,25 +43,41 @@ public class UploaderServiceImpl implements UploaderService {
     @Override
     public int uploadInfo(Long templateId, String info) {
         SurveyTemplate template = this.findTemplate(templateId);
+        Set<String> questions = getQuestionsFromModel(template);
+        int counter = 0;
 
-        for(String row : StringUtils.split(info, NEW_LINE)) {
-            String[] columns = StringUtils.split(row, COMMA);
-            String patientNuip = columns[PATIENT_ID_INDEX];
-            String eventLoadedId = columns[EVENT_ID_INDEX];
-            columns = Arrays.copyOfRange(columns, 2, columns.length);
-            Set<String> questions = getQuestionsFromModel(template);
-            validateQuestionsVsAnswers(questions, columns);
+        try (MappingIterator<String[]> reader = SurveyUtils.readAnswersFromCSV(questions, info)) {
+            while (reader.hasNextValue()) {
+                String[] columns = reader.nextValue();
+                log.info(":::: " + Arrays.toString(columns));
+                List<String> columnList = new ArrayList<>(Arrays.asList(columns));
+                String patientNuip = columnList.remove(START_COLUMN_INDEX);
+                String eventLoadedId = columnList.remove(START_COLUMN_INDEX);
+                validateQuestionsVsAnswers(questions, columnList);
 
-            Patient patient = findPatient(patientNuip);
-            Event event = findEvent(patient.getId(), eventLoadedId, template);
-            Optional<Survey> survey = surveyService.findByEventIdAndTemplateId(event.getId(), template.getId());
+                Patient patient = findPatient(patientNuip);
+                Event event = findEvent(patient.getId(), eventLoadedId, template);
+                String surveyAnswer = SurveyUtils.transformQuestionsAndAnswersToJson(questions, columnList);
+                Optional<Survey> optionalSurvey;
 
-            String surveyAnswer = "";
+                if (SurveyType.BASIC_INFO == template.getType()) {
+                    optionalSurvey = surveyService.findByPatientIdAndTemplateId(patient.getId(), template.getId());
+                }else {
+                    optionalSurvey = surveyService.findByEventIdAndTemplateId(event.getId(), template.getId());
+                }
 
+                optionalSurvey.ifPresent(survey -> {
+                    survey.setSurveyAnswers(surveyAnswer);
+                    surveyService.update(survey);
+                });
 
+                counter++;
+            }
+        } catch (IOException e) {
+            log.error("::: Error reading from CSV", e);
         }
 
-        return 0;
+        return counter;
     }
 
     private SurveyTemplate findTemplate(Long templateId) {
@@ -97,10 +116,12 @@ public class UploaderServiceImpl implements UploaderService {
         return SurveyUtils.getQuestionNamesFromSurveyModel(model);
     }
 
-    private void validateQuestionsVsAnswers(Set<String> questions, String[] columns) {
-        if (questions.size() != columns.length) {
-            throw new IllegalArgumentException("::: Uploaded info doesn't match the model");
+    private void validateQuestionsVsAnswers(Set<String> questions, List<String> columns) {
+        if (questions.size() != columns.size()) {
+            throw new IllegalArgumentException("::: Uploaded info doesn't match the model (#questions)");
         }
     }
+
+
 
 }

@@ -120,6 +120,6 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Optional<Event> findByLoadedId(Long patientId, String loadedId) {
-        return Optional.ofNullable(eventRepository.findOneByPatientIdAndloadedId(patientId, loadedId));
+        return Optional.ofNullable(eventRepository.findOneByPatientIdAndLoadedId(patientId, loadedId));
     }
 }

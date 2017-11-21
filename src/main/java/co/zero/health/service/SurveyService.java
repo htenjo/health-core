@@ -12,6 +12,7 @@ public interface SurveyService extends GenericCrud<Survey> {
     List<Survey> findAllByPatient(Long patientId);
 
     Optional<Survey> findByEventIdAndTemplateId(Long eventId, Long templateId);
+    Optional<Survey> findByPatientIdAndTemplateId(Long patientId, Long templateId);
 
     void deleteAllByEventId(Long eventId);
 

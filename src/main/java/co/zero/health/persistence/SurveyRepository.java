@@ -30,4 +30,6 @@ public interface SurveyRepository extends PagingAndSortingRepository<Survey, Lon
     Stream<Survey> findAllByTemplateId(Long templateId);
 
     Survey findByEventIdAndTemplateId(Long eventId, Long templateId);
+
+    Survey findByPatientIdAndTemplateId(Long patientId, Long templateId);
 }

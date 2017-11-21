@@ -11,5 +11,5 @@ import java.util.List;
 public interface EventRepository extends PagingAndSortingRepository<Event, Long> {
     List<Event> findAllByOrderByPatientIdAsc(Long patientId);
     void deleteAllByPatientId(Long patientId);
-    Event findOneByPatientIdAndloadedId(Long patientId, String loadedId);
+    Event findOneByPatientIdAndLoadedId(Long patientId, String loadedId);
 }
