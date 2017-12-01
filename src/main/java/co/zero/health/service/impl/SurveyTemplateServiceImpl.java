@@ -1,11 +1,9 @@
 package co.zero.health.service.impl;
 
-import co.zero.health.model.Company;
 import co.zero.health.model.Specialty;
 import co.zero.health.model.SurveyTemplate;
 import co.zero.health.persistence.SpecialtyRepository;
 import co.zero.health.persistence.SurveyTemplateRepository;
-import co.zero.health.service.SpecialtyService;
 import co.zero.health.service.SurveyTemplateService;
 import co.zero.health.util.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;

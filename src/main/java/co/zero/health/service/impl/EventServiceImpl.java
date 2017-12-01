@@ -104,7 +104,7 @@ public class EventServiceImpl implements EventService {
      */
     @Override
     public List<Event> findAllByPatientId(Long patientId) {
-        return eventRepository.findAllByPatientId(patientId);
+        return eventRepository.findAllByOrderByPatientIdAsc(patientId);
     }
 
     /**
@@ -116,5 +116,10 @@ public class EventServiceImpl implements EventService {
         return patientService
                 .find(patientId)
                 .orElseThrow(() -> new IllegalArgumentException("Patient with doesn't exist"));
+    }
+
+    @Override
+    public Optional<Event> findByLoadedId(Long patientId, String loadedId) {
+        return Optional.ofNullable(eventRepository.findOneByPatientIdAndLoadedId(patientId, loadedId));
     }
 }

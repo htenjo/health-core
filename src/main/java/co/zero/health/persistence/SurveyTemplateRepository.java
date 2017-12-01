@@ -11,9 +11,10 @@ import java.util.List;
 
 @Repository
 public interface SurveyTemplateRepository extends PagingAndSortingRepository<SurveyTemplate, Long> {
-    List<SurveyTemplate> findAllBySpecialtyId(Long specialtyId);
+    @Query("SELECT t FROM SurveyTemplate t WHERE t.specialty.id = :specialtyId ORDER BY t.id ASC")
+    List<SurveyTemplate> findAllBySpecialtyId(@Param("specialtyId") Long specialtyId);
 
-    @Query("SELECT t FROM SurveyTemplate t WHERE t.specialty.company.id = :companyId AND t.type = :type")
+    @Query("SELECT t FROM SurveyTemplate t WHERE t.specialty.company.id = :companyId AND t.type = :type ORDER BY t.id ASC")
     List<SurveyTemplate> findAllByCompanyId(
             @Param("companyId") Long companyId,
             @Param("type")SurveyType type);

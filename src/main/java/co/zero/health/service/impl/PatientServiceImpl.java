@@ -52,7 +52,8 @@ public class PatientServiceImpl implements PatientService {
 
     @Override
     public Patient update(Patient entity) {
-        //Company company = SecurityUtil.getCompany();
+        Company company = SecurityUtil.getCompany();
+        entity.setCompany(company);
         return patientRepository.save(entity);
     }
 
